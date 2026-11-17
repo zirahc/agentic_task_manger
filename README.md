@@ -20,6 +20,14 @@ cd dashboard
 
 Then open http://127.0.0.1:8765.
 
+On Linux / macOS (needs Python 3.12+):
+
+```bash
+./run.sh --setup     # first time only
+./run.sh --demo      # fake CLI
+./run.sh             # real CLIs; --port 9000 to change the port
+```
+
 Without the script:
 
 ```powershell

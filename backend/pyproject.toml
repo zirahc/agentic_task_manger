@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[project]
+name = "claude-codex-dash"
+version = "0.1.0"
+description = "Local dashboard that orchestrates Claude Code and Codex CLI sessions."
+requires-python = ">=3.12"
+dependencies = [
+  "starlette==0.47.2",
+  "uvicorn==0.35.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest==8.4.1",
+  "httpx==0.28.1",
+  "ruff==0.12.7",
+  "mypy==1.17.1",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = [".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "S", "BLE"]
+ignore = [
+  "S603", # subprocess without shell: argv lists are the design
+  "S607", # partial executable paths are resolved deliberately (taskkill)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S108"]
+
+[tool.mypy]
+strict = true
+python_version = "3.12"
+exclude = ["\\.venv"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

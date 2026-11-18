@@ -1385,3 +1385,56 @@ button.flow-step:hover {
     padding-right: 16px;
   }
 }
+
+/* ---- tests ------------------------------------------------------------------------- */
+.tests-howto {
+  margin-bottom: 14px;
+}
+.tests-howto p {
+  margin: 10px 0 6px;
+}
+.tests-howto .row-actions {
+  margin-top: 8px;
+}
+.tests-table td.bad {
+  color: var(--bad);
+  font-weight: 600;
+}
+.tests-table tr.row-open td {
+  background: var(--panel-hover);
+}
+.tests-table tr.detail-row:hover {
+  background: none;
+}
+.tests-table tr.detail-row > td {
+  background: var(--bg-sunken);
+  cursor: default;
+}
+.test-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.test-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+.test-summary {
+  margin: 0;
+  white-space: pre-wrap;
+}
+.metric-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.cases-scroll {
+  max-height: 360px;
+  overflow: auto;
+}
+.cases-scroll td {
+  padding: 6px 12px;
+}

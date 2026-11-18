@@ -7,6 +7,20 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **Test results (first slice of Phase 4 submissions):**
+  - Sessions can end their answer with a fenced ```` ```submission ```` JSON block. The
+    dashboard stores each block when the session ends (new `submissions` table), with
+    the commit that was checked out (`-dirty` when files differed).
+  - Built-in type `test-result`: status, suite, summary, pass/fail/skip counts,
+    TP/FP/TN/FN and per-case rows. Missing counts are derived from the cases.
+    Precision, recall, F1, accuracy and false-positive rate are computed by the
+    dashboard, not the model.
+  - Invalid blocks are stored with the reason and their raw text, never dropped.
+  - New **Tests** view: results table with a task filter, per-case details (failures
+    first), delete, and a copyable instruction snippet for the Tester role.
+  - API: `GET /api/submissions?type=&taskId=`, `DELETE /api/submissions/{id}`.
+  - `./run.sh` launcher for Linux/macOS.
+
 - **Parallel sessions in AI workflows:**
   - New step access `isolated`. Several coding sessions run at once, each in its own
     git worktree created from a snapshot of the task folder (uncommitted and

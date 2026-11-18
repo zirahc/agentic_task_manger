@@ -39,7 +39,8 @@ dashboard/
   backend/
     app/main.py                app factory, request guard, static files
     app/api/routes.py          thin handlers: parse → service → JSON
-    app/services/              domain logic (the authority): profiles, roles, tasks, runs, supervisor
+    app/services/              domain logic (the authority): profiles, roles, tasks, runs, supervisor,
+                               submissions
     app/runner/                CLI resolution, argv building, stream parsing, process control
     app/db.py, validate.py, errors.py, config.py
     tests/                     pytest suite + real CLI stream fixtures
@@ -116,6 +117,10 @@ browser (headless Chrome screenshots work) and check the console for errors.
     `git worktree add --detach`, then a diff saved as a patch, then the worktree is
     removed. Never touch the user's index, branch or working files from that code.
     Write patches as bytes, because Windows text mode corrupts them.
+- **Submissions** (`services/submissions.py`): sessions write ```` ```submission {json} ````
+  blocks; the supervisor stores them when the session ends, before marking it finished.
+  They are untrusted model output: validate them there, store invalid ones with the
+  reason, and compute derived numbers (metrics) on the server.
 - **Local-only:** the server binds `127.0.0.1`. The `Guard` middleware rejects
   foreign `Host` headers (DNS rebinding) and API calls without `X-Dash: 1`
   (cross-site requests). Never relax either. No accounts, no telemetry, no API keys.

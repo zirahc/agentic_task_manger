@@ -10,13 +10,13 @@ from typing import Any
 
 from ..db import Database, Row, dumps, loads, now_iso
 from ..errors import ApiError
-from ..runner import git
+from ..runner import git, parse
 from ..runner.adapters import CommandSpec, build_command
 from ..runner.git import GitError
 from ..runner.parse import Event, StreamParser, stderr_event
 from ..runner.process import ManagedProcess
 from ..runner.resolve import resolve_tool
-from . import orchestrator, runs, settings
+from . import orchestrator, runs, settings, submissions
 
 log = logging.getLogger(__name__)
 
@@ -325,6 +325,7 @@ class Supervisor:
 
         status, error = _outcome(code, parser, active, timeout, process.stderr_tail)
         result_text = parser.result_text
+        self._record_submissions(row, run_dir, [*parser.submission_texts, result_text or ""])
         patch_path: str | None = None
         if isolation is not None and status == "succeeded":
             try:
@@ -339,6 +340,19 @@ class Supervisor:
             result_text=result_text,
             usage=parser.usage,
             patch_path=patch_path,
+        )
+
+    def _record_submissions(self, row: Row, folder: Path, texts: list[str]) -> None:
+        """Store ```submission blocks (before the session is marked finished, so a run that
+        shows as done already has its submissions), with the commit that was checked out."""
+        if not any(parse.SUBMISSION_MARK in text for text in texts):
+            return
+        submissions.record(
+            self._db,
+            session_id=row["id"],
+            run_id=row["run_id"],
+            texts=texts,
+            commit=git.head(folder),
         )
 
     def _finish(

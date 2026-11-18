@@ -5,6 +5,7 @@ import { ConfirmHost, ToastHost } from './components/ui.js';
 import { TasksView, TaskDetail } from './views/tasks.js';
 import { RunsView, RunDetail } from './views/runs.js';
 import { SessionsView } from './views/sessions.js';
+import { TestsView } from './views/tests.js';
 import { RolesView } from './views/roles.js';
 import { ProfilesView } from './views/profiles.js';
 import { EnvironmentView, SettingsView } from './views/environment.js';
@@ -13,6 +14,7 @@ const NAV = [
   { id: 'tasks', label: 'Tasks', icon: '▦' },
   { id: 'runs', label: 'Runs', icon: '▶' },
   { id: 'sessions', label: 'Sessions', icon: '◉' },
+  { id: 'tests', label: 'Tests', icon: '✓' },
   { id: 'roles', label: 'Roles', icon: '✦' },
   { id: 'profiles', label: 'Profiles', icon: '⚙' },
   { id: 'environment', label: 'Environment', icon: '◍' },
@@ -74,6 +76,8 @@ function renderView(route) {
       return route.id ? html`<${RunDetail} key=${route.id} id=${route.id} />` : html`<${RunsView} />`;
     case 'sessions':
       return html`<${SessionsView} />`;
+    case 'tests':
+      return html`<${TestsView} />`;
     case 'roles':
       return html`<${RolesView} />`;
     case 'profiles':

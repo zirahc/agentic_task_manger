@@ -102,6 +102,10 @@ export const api = {
   sessionEvents: (/** @type {string} */ id, /** @type {number} */ after) =>
     request('GET', `/api/sessions/${enc(id)}/events?after=${String(after)}`),
   cancelSession: (/** @type {string} */ id) => request('POST', `/api/sessions/${enc(id)}/cancel`),
+
+  submissions: (/** @type {string} */ type, /** @type {string} */ taskId) =>
+    request('GET', `/api/submissions?type=${enc(type)}&taskId=${enc(taskId)}`),
+  deleteSubmission: (/** @type {string} */ id) => request('DELETE', `/api/submissions/${enc(id)}`),
 };
 
 /** Human text for any rejection. */

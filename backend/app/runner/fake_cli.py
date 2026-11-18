@@ -7,6 +7,8 @@ Prompt keywords change behaviour:
   FAKE_SLOW      -> keep running for a long time (for cancel/timeout tests)
   FAKE_DENY      -> (antigravity) soft-deny a tool: stderr notice, still exits 0
   FAKE_PLAN_BAD  -> as planner, answer without a JSON plan
+  FAKE_TEST_RESULT     -> end the answer with a valid ```submission test-result block
+  FAKE_SUBMISSION_BAD  -> end the answer with a ```submission block that is not JSON
 
 As the workflow planner it answers with a plan built from the listed profiles; as a
 workflow step it reports which inputs it received; as a revision it echoes the feedback.
@@ -48,6 +50,29 @@ def _reply(prompt: str) -> str:
         Path(f"{slug}.txt").write_text(f"written for '{step}'\n", encoding="utf-8")
         used += f" Wrote {slug}.txt."
     return f"Report for '{step}'.{used}"
+
+
+def _fake_submission(prompt: str) -> str:
+    if "FAKE_SUBMISSION_BAD" in prompt:
+        return '\n\n```submission\n{"type": "test-result", status: pass}\n```'
+    if "FAKE_TEST_RESULT" not in prompt:
+        return ""
+    cases = [
+        {"name": "uBlock Origin", "expected": "detected", "actual": "detected", "outcome": "tp"},
+        {"name": "AdGuard", "expected": "detected", "actual": "detected", "outcome": "tp"},
+        {"name": "Ghostery", "expected": "detected", "actual": "missed", "outcome": "fn"},
+        {"name": "Dark Reader", "expected": "clean", "actual": "detected", "outcome": "fp"},
+        {"name": "Grammarly", "expected": "clean", "actual": "clean", "outcome": "tn"},
+    ]
+    payload = {
+        "type": "test-result",
+        "suite": "adblock detection",
+        "status": "fail",
+        "summary": "2 of 3 ad blockers detected; Dark Reader flagged by mistake.",
+        "counts": {"passed": 3, "failed": 2, "skipped": 0},
+        "cases": cases,
+    }
+    return f"\n\n```submission\n{json.dumps(payload, indent=2)}\n```"
 
 
 def _plan_reply(prompt: str) -> str:
@@ -165,7 +190,7 @@ def main() -> int:
     if "FAKE_SLOW" in prompt:
         delay = 30.0
 
-    reply = _reply(prompt)
+    reply = _reply(prompt) + _fake_submission(prompt)
     if tool == "antigravity":
         return _antigravity(prompt, title, session, delay, reply)
 

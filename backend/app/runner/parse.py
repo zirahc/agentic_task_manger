@@ -12,6 +12,7 @@ from typing import Any
 
 MAX_TEXT = 8000
 MAX_SUMMARY = 400
+SUBMISSION_MARK = "```submission"
 
 
 def _clip(text: str, limit: int = MAX_TEXT) -> str:
@@ -37,8 +38,15 @@ class StreamParser:
     usage: dict[str, Any] = field(default_factory=dict)
     permission_denials: list[str] = field(default_factory=list)
     finished: bool = False
+    submission_texts: list[str] = field(default_factory=list)
+    """Full (unclipped) assistant messages that contain a ```submission block."""
     _last_message: str = ""
     _agy_text: dict[int, str] = field(default_factory=dict)
+
+    def _note_text(self, text: str) -> None:
+        self._last_message = text
+        if SUBMISSION_MARK in text:
+            self.submission_texts.append(text)
 
     def feed(self, line: str) -> list[Event]:
         line = line.strip()
@@ -94,7 +102,7 @@ class StreamParser:
         text = self._agy_text.pop(key, "")
         if not text.strip():
             return []
-        self._last_message = text
+        self._note_text(text)
         return [Event("message", {"text": _clip(text)})]
 
     def _agy_result(self, result: dict[str, Any]) -> list[Event]:
@@ -153,7 +161,7 @@ class StreamParser:
             if item_type == "text":
                 text = _str(item.get("text"))
                 if text:
-                    self._last_message = text
+                    self._note_text(text)
                     events.append(Event("message", {"text": _clip(text)}))
             elif item_type == "tool_use":
                 events.append(_claude_tool_event(item))
@@ -238,7 +246,7 @@ class StreamParser:
             text = _str(item.get("text"))
             if not text:
                 return []
-            self._last_message = text
+            self._note_text(text)
             return [Event("message", {"text": _clip(text)})]
         if item_type == "command_execution":
             return [

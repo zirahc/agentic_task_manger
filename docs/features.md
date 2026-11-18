@@ -211,6 +211,7 @@ Built-in types (each has a fixed JSON schema):
 | `handoff`  | to role, message, context refs                       | Pass work to another role            |
 | `result`   | status, summary, files changed, tests run, follow-ups | Required final submission           |
 | `blocker`  | reason, what is needed                               | Session cannot continue              |
+| `test-result` | status, suite, summary, counts, confusion (tp/fp/tn/fn), cases[] | Tester (✅ built) |
 
 Custom submission types with an owner-defined JSON schema. [suggested]
 
@@ -310,7 +311,7 @@ edit rules directly. [suggested]
 
 ## Views (sidebar)
 
-`Tasks` · `Runs` · `Sessions` · `Roles & Teams` · `Profiles` · `Inbox` · `Usage` ·
+`Tasks` · `Runs` · `Sessions` · `Tests` · `Roles & Teams` · `Profiles` · `Inbox` · `Usage` ·
 `Environment` · `Settings`
 
 ## Data model (initial sketch)
@@ -345,6 +346,11 @@ edits never change history.
 4. **Submissions**: MCP submission server + fenced-block fallback, built-in types,
    role contracts, and a submissions timeline. These will let steps report progress
    and questions *during* a step. Today a step hands over only its final report.
+   - ✅ Started, at the owner's request: the fenced-block fallback (read when the
+     session ends), the `submissions` table, the `test-result` type (counts,
+     TP/FP/TN/FN, cases; metrics computed server-side) and a **Tests** view.
+     Still to do: the MCP server, the other built-in types, live parsing during a
+     session, role contracts and a submissions timeline.
 5. **Orchestration extras**: saved teams, rules engine, Inbox, talk-to-session, and
    lead/workers (a step that creates more steps).
 6. **Polish**: worktrees, usage view, limit handling, templates, history replay.

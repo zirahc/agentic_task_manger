@@ -142,6 +142,23 @@ MIGRATIONS: list[str] = [
     ALTER TABLE sessions ADD COLUMN isolated INTEGER NOT NULL DEFAULT 0;
     ALTER TABLE sessions ADD COLUMN patch_path TEXT;
     """,
+    # 4: submissions (structured reports parsed from ```submission blocks)
+    """
+    CREATE TABLE submissions (
+        id TEXT PRIMARY KEY,
+        session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
+        run_id TEXT NOT NULL REFERENCES runs(id) ON DELETE CASCADE,
+        type TEXT NOT NULL,
+        payload TEXT NOT NULL,
+        valid INTEGER NOT NULL,
+        error TEXT,
+        commit_sha TEXT,
+        created_at TEXT NOT NULL
+    );
+    CREATE INDEX submissions_type ON submissions(type, created_at);
+    CREATE INDEX submissions_run ON submissions(run_id);
+    CREATE INDEX submissions_session ON submissions(session_id);
+    """,
 ]
 
 

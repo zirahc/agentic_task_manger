@@ -60,6 +60,9 @@ Settings via environment variables: `DASH_PORT` (default 8765), `DASH_DATA_DIR`
      check the preview (exact command and prompt), then Start.
 6. Follow the run live in **Runs** and **Sessions**. Set how many sessions of each
    CLI may run at once in **Settings**.
+7. **Tests** collects test results. Copy the snippet shown there into your Tester role:
+   its sessions then end with a `submission` block, and each one becomes a row with
+   pass/fail counts, TP/FP/TN/FN, precision/recall/F1 and the commit that was tested.
 
 ## Status
 

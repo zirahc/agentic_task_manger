@@ -73,6 +73,20 @@ def locate(folder: Path) -> RepoLocation | None:
     return RepoLocation(Path(root), prefix.rstrip("/"))
 
 
+def head(folder: Path) -> str | None:
+    """The short id of the commit checked out in `folder`, with '-dirty' when files differ.
+
+    None outside a repository or before the first commit. Read-only: `--no-optional-locks`
+    stops `git status` from refreshing the user's index.
+    """
+    try:
+        sha = _git(["rev-parse", "--short", "HEAD"], folder).strip()
+        changes = _git(["--no-optional-locks", "status", "--porcelain"], folder)
+    except GitError:
+        return None
+    return f"{sha}-dirty" if changes.strip() else sha
+
+
 def snapshot(root: Path, scratch: Path) -> str:
     scratch.mkdir(parents=True, exist_ok=True)
     index = scratch / "snapshot.index"

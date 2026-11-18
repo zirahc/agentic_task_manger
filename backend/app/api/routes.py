@@ -12,7 +12,16 @@ from starlette.routing import Route
 from ..config import Config
 from ..db import Database
 from ..errors import ApiError
-from ..services import environment, orchestrator, profiles, roles, runs, settings, tasks
+from ..services import (
+    environment,
+    orchestrator,
+    profiles,
+    roles,
+    runs,
+    settings,
+    submissions,
+    tasks,
+)
 from ..services.supervisor import Supervisor
 
 
@@ -248,6 +257,25 @@ async def cancel_session(request: Request) -> Response:
     return ok(runs.serialize_session(runs.get_session_row(c.db, session_id)))
 
 
+# ---- submissions -------------------------------------------------------------------
+
+
+async def list_submissions(request: Request) -> Response:
+    query = request.query_params
+    return ok(
+        submissions.list_submissions(
+            ctx(request).db,
+            kind=(query.get("type") or "")[:40],
+            task_id=(query.get("taskId") or "")[:40],
+        )
+    )
+
+
+async def delete_submission(request: Request) -> Response:
+    submissions.delete_submission(ctx(request).db, param(request, "id"))
+    return no_content()
+
+
 ROUTES = [
     Route("/api/environment", get_environment, methods=["GET"]),
     Route("/api/settings", get_settings, methods=["GET"]),
@@ -280,4 +308,6 @@ ROUTES = [
     Route("/api/sessions", list_sessions, methods=["GET"]),
     Route("/api/sessions/{id}/events", session_events, methods=["GET"]),
     Route("/api/sessions/{id}/cancel", cancel_session, methods=["POST"]),
+    Route("/api/submissions", list_submissions, methods=["GET"]),
+    Route("/api/submissions/{id}", delete_submission, methods=["DELETE"]),
 ]
